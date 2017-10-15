@@ -25,7 +25,7 @@ public class UserAccount {
     /**
      * Creates new instance of {@link UserAccount}.
      *
-     * @param userId user id
+     * @param userId  user id
      * @param balance initial balance
      */
     public UserAccount(UUID userId, BigDecimal balance) {
@@ -82,11 +82,17 @@ public class UserAccount {
     @Override
     public boolean equals(Object obj) {
 
-        if (!(obj instanceof UserAccount)) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
-        return userId.equals(((UserAccount) obj).getId());
+        UserAccount account = (UserAccount) obj;
+
+        return userId.equals(account.userId);
     }
 
     @Override
