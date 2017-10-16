@@ -19,7 +19,7 @@ public class AccountStorage
     /**
      * Add user account.
      *
-     * @param account
+     * @param account user account. Must not be {@code null}
      */
     public void addAccount(UserAccount account)
     {
@@ -29,11 +29,22 @@ public class AccountStorage
     /**
      * Delete user account.
      *
-     * @param userId
+     * @param userId user id. Must not be {@code null}
      */
     public void deleteAccount(UUID userId)
     {
         accounts.remove(userId);
+    }
+
+    /**
+     * Get user account by id.
+     *
+     * @param userId user id. Must be not {@code null}
+     * @return {@link UserAccount} for passed id if present. {@code null} otherwise.
+     */
+    public UserAccount getUserAccount(UUID userId)
+    {
+        return accounts.get(userId);
     }
 
     /**
