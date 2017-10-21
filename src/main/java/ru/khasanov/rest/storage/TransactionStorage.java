@@ -35,6 +35,16 @@ public class TransactionStorage {
     }
 
     /**
+     * Get list of all transactions.
+     *
+     * @return {@link List} of all transactions.
+     */
+    public List<TransferTransaction> getAlTransactions()
+    {
+        return transactions;
+    }
+
+    /**
      * Get list of transactions for specific transmitter.
      *
      * @param from transmitter id. Must not be {@code null}

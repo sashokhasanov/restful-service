@@ -1,5 +1,7 @@
 package ru.khasanov.rest.model;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -9,14 +11,19 @@ import java.util.UUID;
  *
  * @author Aleksandr Khasanov
  */
+@XmlRootElement
 public class TransferTransaction {
 
+    @XmlElement
     private UUID from;
 
+    @XmlElement
     private UUID to;
 
+    @XmlElement
     private BigDecimal amount;
 
+    @XmlElement
     private OffsetDateTime dateTime;
 
     /**
