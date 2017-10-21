@@ -69,54 +69,43 @@ public class TransactionManager {
      * @param fromId transmitter id. Must not be {@code null}
      * @param toId   recipient id. Must not be {@code null}
      * @param amount amount of money to transfer. Must not be {@code null}
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if the computation threw an exception
+     * @throws TimeoutException     if the wait timed out
      */
-    public void transfer(UUID fromId, UUID toId, BigDecimal amount) {
-        try {
-            executorService.submit(new TransferTask(fromId, toId, amount)).get(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
+    public void transfer(UUID fromId, UUID toId, BigDecimal amount) throws InterruptedException, ExecutionException, TimeoutException {
+        executorService.submit(new TransferTask(fromId, toId, amount)).get(timeout, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Get all transactions.
      *
      * @return list of all transactions.
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if the computation threw an exception
+     * @throws TimeoutException     if the wait timed out
      */
-    public List<TransferTransaction> geAllTransactions() {
-        try {
-            return executorService.submit(() -> transactionStorage.getAlTransactions()).get(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public List<TransferTransaction> geAllTransactions() throws InterruptedException, ExecutionException, TimeoutException {
+
+        return executorService.submit(() ->
+                transactionStorage.getAlTransactions()).get(timeout, TimeUnit.MILLISECONDS);
+
     }
 
     /**
      * Get list of transactions for specific transmitter.
      *
      * @param fromId transmitter id. Must not be {@code null}
-     * @return list of transactions for specified transmitter.
+     * @return list of transactions for specified transmitter
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if the computation threw an exception
+     * @throws TimeoutException     if the wait timed out
      */
-    public List<TransferTransaction> getFromTransactions(UUID fromId) {
-        try {
-            return executorService.submit(() -> transactionStorage.getFromTransactions(fromId)).get(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public List<TransferTransaction> getFromTransactions(UUID fromId) throws InterruptedException, ExecutionException, TimeoutException {
+
+        return executorService.submit(() ->
+                transactionStorage.getFromTransactions(fromId)).get(timeout, TimeUnit.MILLISECONDS);
+
     }
 
     /**
@@ -124,18 +113,31 @@ public class TransactionManager {
      *
      * @param toId recipient id. Must not be {@code null}
      * @return list of transactions for specified recipient
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if the computation threw an exception
+     * @throws TimeoutException     if the wait timed out
      */
-    public List<TransferTransaction> getToTransactions(UUID toId) {
-        try {
-            return executorService.submit(() -> transactionStorage.getFromTransactions(toId)).get(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public List<TransferTransaction> getToTransactions(UUID toId) throws InterruptedException, ExecutionException, TimeoutException {
+
+        return executorService.submit(() ->
+                transactionStorage.getToTransactions(toId)).get(timeout, TimeUnit.MILLISECONDS);
+
+    }
+
+    /**
+     * Get list of transactions for specific period of time.
+     *
+     * @param fromDate start point. Must not be {@code null}
+     * @param toDate   end point. Must not be {@code null}
+     * @return @link List} of transactions for specified period of time
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if the computation threw an exception
+     * @throws TimeoutException     if the wait timed out
+     */
+    public List<TransferTransaction> getDateTimeTransactions(OffsetDateTime fromDate, OffsetDateTime toDate) throws InterruptedException, ExecutionException, TimeoutException {
+        return executorService.submit(() ->
+                transactionStorage.getDateTimeTransactions(fromDate, toDate)).get(timeout, TimeUnit.MILLISECONDS);
+
     }
 
     private class TransferTask implements Runnable {
@@ -145,7 +147,7 @@ public class TransactionManager {
 
         private BigDecimal amount;
 
-        public TransferTask(UUID fromId, UUID toId, BigDecimal amount) {
+        TransferTask(UUID fromId, UUID toId, BigDecimal amount) {
             this.fromId = fromId;
             this.toId = toId;
             this.amount = amount;
@@ -175,7 +177,7 @@ public class TransactionManager {
             }
 
             if (fromAccount.getBalance().compareTo(amount) < 0) {
-                throw new IllegalArgumentException("Not enough money to transfer");
+                throw new IllegalArgumentException("Balance is too low");
             }
 
             TransferTransaction transaction = new TransferTransaction(fromId, toId, amount, OffsetDateTime.now());
