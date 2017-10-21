@@ -12,8 +12,7 @@ import java.util.UUID;
  *
  * @author Aleksandr Khasanov
  */
-public class AccountStorage
-{
+public class AccountStorage {
     private Map<UUID, UserAccount> accounts = new HashMap<>();
 
     /**
@@ -21,8 +20,7 @@ public class AccountStorage
      *
      * @param account user account. Must not be {@code null}
      */
-    public void addAccount(UserAccount account)
-    {
+    public void addAccount(UserAccount account) {
         accounts.put(account.getUserId(), account);
     }
 
@@ -32,8 +30,7 @@ public class AccountStorage
      * @param userId user id. Must not be {@code null}
      * @return {@code true} if account was successfully deleted. {@code false} otherwise.
      */
-    public boolean deleteAccount(UUID userId)
-    {
+    public boolean deleteAccount(UUID userId) {
         return accounts.remove(userId) != null;
     }
 
@@ -43,8 +40,7 @@ public class AccountStorage
      * @param userId user id. Must be not {@code null}
      * @return {@link UserAccount} for passed id if present. {@code null} otherwise.
      */
-    public UserAccount getUserAccount(UUID userId)
-    {
+    public UserAccount getUserAccount(UUID userId) {
         return accounts.get(userId);
     }
 
@@ -53,8 +49,7 @@ public class AccountStorage
      *
      * @return collection of all user accounts
      */
-    public Collection<UserAccount> getAllUserAccounts()
-    {
+    public Collection<UserAccount> getAllUserAccounts() {
         return accounts.values();
     }
 }

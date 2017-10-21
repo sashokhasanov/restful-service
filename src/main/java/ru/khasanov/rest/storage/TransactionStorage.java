@@ -39,8 +39,7 @@ public class TransactionStorage {
      *
      * @return {@link List} of all transactions.
      */
-    public List<TransferTransaction> getAlTransactions()
-    {
+    public List<TransferTransaction> getAlTransactions() {
         return transactions;
     }
 

@@ -60,8 +60,7 @@ public class Main {
         }
     }
 
-    private static void initApplicationService()
-    {
+    private static void initApplicationService() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
 
         AccountStorage accountStorage = new AccountStorage();
@@ -70,7 +69,7 @@ public class Main {
         ApplicationService.getInstance().initAccountManager(accountManager);
 
         TransactionStorage transactionStorage = new TransactionStorage();
-        TransactionManager transactionManager  = new TransactionManager(transactionStorage, accountStorage, executorService);
+        TransactionManager transactionManager = new TransactionManager(transactionStorage, accountStorage, executorService);
         transactionManager.setTimeout(1000);
         ApplicationService.getInstance().initTransactionManager(transactionManager);
     }

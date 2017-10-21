@@ -96,7 +96,7 @@ public class AccountResource {
     /**
      * Create new user account.
      *
-     * @param userId user id. Must not be {@code null}
+     * @param userId  user id. Must not be {@code null}
      * @param balance initial balance. Must not be {@code null}
      * @return {@link Response} specifying result of operation
      */
