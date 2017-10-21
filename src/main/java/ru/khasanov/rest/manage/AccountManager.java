@@ -57,11 +57,17 @@ public class AccountManager {
 
     /**
      * Create new user account.
+     *
+     * @return {@link UserAccount} if it was successfully created. {@code null} otherwise
      */
-    public void createNewAccount() {
+    public UserAccount createNewAccount() {
         try {
             executorService.submit(() ->
-                    accountStorage.addAccount(new UserAccount())).get(timeout, TimeUnit.MILLISECONDS);
+            {
+                UserAccount account = new UserAccount();
+                accountStorage.addAccount(account);
+                return account;
+            }).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -69,18 +75,24 @@ public class AccountManager {
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     /**
      * Create new user account.
      *
-     * @param userId uiser id. Must not be {@code null}
+     * @param userId  user id. Must not be {@code null}
      * @param balance user balance. Must not be {@code null}
+     * @return {@link UserAccount} if it was successfully created. {@code null} otherwise
      */
-    public void createNewAccount(UUID userId, BigDecimal balance) {
+    public UserAccount createNewAccount(UUID userId, BigDecimal balance) {
         try {
             executorService.submit(() ->
-                    accountStorage.addAccount(new UserAccount(userId, balance))).get(timeout, TimeUnit.MILLISECONDS);
+            {
+                UserAccount account = new UserAccount(userId, balance);
+                accountStorage.addAccount(account);
+                return account;
+            }).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -88,17 +100,23 @@ public class AccountManager {
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     /**
      * Delete user account by id.
      *
      * @param userId user id. Must not be {@code null}
+     * @return {@code true} if account was successfully deleted. {@code false} otherwise
      */
-    public void deleteAccount(UUID userId) {
+    public boolean deleteAccount(UUID userId) {
         try {
             executorService.submit(() ->
-                    accountStorage.deleteAccount(userId)).get(timeout, TimeUnit.MILLISECONDS);
+                    {
+                        return accountStorage.deleteAccount(userId);
+                    }
+
+                    ).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -106,15 +124,16 @@ public class AccountManager {
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     /**
-     * Find user account by id.
+     * Get user account by id.
      *
      * @param userId user id. Must not be {@code null}
-     * @return {@link UserAccount} if found. {@code null} otherwise
+     * @return {@link UserAccount} if exists. {@code null} otherwise
      */
-    public UserAccount find(UUID userId) {
+    public UserAccount getAccount(UUID userId) {
         try {
             return executorService.submit(() ->
                     accountStorage.getUserAccount(userId)).get(timeout, TimeUnit.MILLISECONDS);

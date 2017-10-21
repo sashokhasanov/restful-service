@@ -23,17 +23,18 @@ public class AccountStorage
      */
     public void addAccount(UserAccount account)
     {
-        accounts.put(account.getId(), account);
+        accounts.put(account.getUserId(), account);
     }
 
     /**
      * Delete user account.
      *
      * @param userId user id. Must not be {@code null}
+     * @return {@code true} if account was successfully deleted. {@code false} otherwise.
      */
-    public void deleteAccount(UUID userId)
+    public boolean deleteAccount(UUID userId)
     {
-        accounts.remove(userId);
+        return accounts.remove(userId) != null;
     }
 
     /**

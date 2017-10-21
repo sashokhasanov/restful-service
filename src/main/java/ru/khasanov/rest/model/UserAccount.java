@@ -1,5 +1,7 @@
 package ru.khasanov.rest.model;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -8,10 +10,13 @@ import java.util.UUID;
  *
  * @author Aleksandr Khasanov
  */
+@XmlRootElement
 public class UserAccount {
 
+    @XmlElement
     private UUID userId;
 
+    @XmlElement
     private BigDecimal balance;
 
     /**
@@ -38,7 +43,7 @@ public class UserAccount {
      *
      * @return user id
      */
-    public UUID getId() {
+    public UUID getUserId() {
         return userId;
     }
 
