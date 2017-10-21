@@ -4,7 +4,7 @@ import ru.khasanov.rest.model.UserAccount;
 import ru.khasanov.rest.storage.AccountStorage;
 
 import java.math.BigDecimal;
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -59,8 +59,8 @@ public class AccountManager {
      * Create new user account.
      *
      * @return created {@link UserAccount}
-     * @throws ExecutionException   if the computation threw an exception
      * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if the computation threw an exception
      * @throws TimeoutException     if the wait timed out
      */
     public UserAccount createNewAccount() throws InterruptedException, ExecutionException, TimeoutException {
@@ -78,8 +78,8 @@ public class AccountManager {
      * @param userId  user id. Must not be {@code null}
      * @param balance user balance. Must not be {@code null}
      * @return created {@link UserAccount}
-     * @throws ExecutionException   if the computation threw an exception
      * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if the computation threw an exception
      * @throws TimeoutException     if the wait timed out
      */
     public UserAccount createNewAccount(UUID userId, BigDecimal balance) throws InterruptedException, ExecutionException, TimeoutException {
@@ -96,8 +96,8 @@ public class AccountManager {
      *
      * @param userId user id. Must not be {@code null}
      * @return {@code true} if account was successfully deleted. {@code false} otherwise
-     * @throws ExecutionException   if the computation threw an exception
      * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if the computation threw an exception
      * @throws TimeoutException     if the wait timed out
      */
     public boolean deleteAccount(UUID userId) throws InterruptedException, ExecutionException, TimeoutException {
@@ -111,8 +111,8 @@ public class AccountManager {
      *
      * @param userId user id. Must not be {@code null}
      * @return {@link UserAccount} if exists. {@code null} otherwise
-     * @throws ExecutionException   if the computation threw an exception
      * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if the computation threw an exception
      * @throws TimeoutException     if the wait timed out
      */
     public UserAccount getAccount(UUID userId) throws InterruptedException, ExecutionException, TimeoutException {
@@ -122,14 +122,14 @@ public class AccountManager {
     }
 
     /**
-     * Get collection of all user accounts.
+     * Get list of all user accounts.
      *
-     * @return collection of all user accounts
-     * @throws ExecutionException   if the computation threw an exception
+     * @return {@link List} of all user accounts
      * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException   if the computation threw an exception
      * @throws TimeoutException     if the wait timed out
      */
-    public Collection<UserAccount> getAllAccounts() throws InterruptedException, ExecutionException, TimeoutException {
+    public List<UserAccount> getAllAccounts() throws InterruptedException, ExecutionException, TimeoutException {
 
         return executorService.submit(() ->
                 accountStorage.getAllUserAccounts()).get(timeout, TimeUnit.MILLISECONDS);

@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -34,18 +35,21 @@ public class AccountResource {
     /**
      * Get all user accounts.
      *
-     * @return Collection of all user accounts
+     * @return {@link List} of all user accounts
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<UserAccount> getAllAccounts() {
+    public List<UserAccount> getAllAccounts() {
 
         try {
             return accountManager.getAllAccounts();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new InternalServerErrorException("Request failed");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new WebApplicationException("Request processing was interrupted");
         } catch (TimeoutException e) {
-            throw new ServiceUnavailableException("Request timed out");
+            throw new ServiceUnavailableException("Request processing timed out");
+        } catch (ExecutionException e) {
+            throw new InternalServerErrorException("Internal error while request processing");
         }
     }
 
@@ -65,10 +69,13 @@ public class AccountResource {
             if (account != null) {
                 return account;
             }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new InternalServerErrorException("Request failed");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new WebApplicationException("Request processing was interrupted");
         } catch (TimeoutException e) {
-            throw new ServiceUnavailableException("Request timed out");
+            throw new ServiceUnavailableException("Request processing timed out");
+        } catch (ExecutionException e) {
+            throw new InternalServerErrorException("Internal error while request processing");
         }
 
         throw new NotFoundException("Account not found: " + userId);
@@ -85,11 +92,13 @@ public class AccountResource {
         try {
             UserAccount account = accountManager.createNewAccount();
             return Response.created(URI.create(ACCOUNTS + "/" + account.getUserId())).build();
-
-        } catch (InterruptedException | ExecutionException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Response.status(Response.Status.NOT_MODIFIED).build();
         } catch (TimeoutException e) {
             return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
+        } catch (ExecutionException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -105,10 +114,13 @@ public class AccountResource {
         try {
             UserAccount account = accountManager.createNewAccount(userId, balance);
             return Response.created(URI.create(ACCOUNTS + "/" + account.getUserId())).build();
-        } catch (InterruptedException | ExecutionException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Response.status(Response.Status.NOT_MODIFIED).build();
         } catch (TimeoutException e) {
             return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
+        } catch (ExecutionException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -127,10 +139,13 @@ public class AccountResource {
                 return Response.ok().build();
             }
             return Response.status(Response.Status.NOT_FOUND).build();
-        } catch (InterruptedException | ExecutionException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Response.status(Response.Status.NOT_MODIFIED).build();
         } catch (TimeoutException e) {
             return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
+        } catch (ExecutionException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

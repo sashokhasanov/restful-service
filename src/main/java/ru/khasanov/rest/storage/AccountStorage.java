@@ -2,10 +2,7 @@ package ru.khasanov.rest.storage;
 
 import ru.khasanov.rest.model.UserAccount;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * In-memory storage for user accounts.
@@ -45,11 +42,11 @@ public class AccountStorage {
     }
 
     /**
-     * Get the collection of all user accounts.
+     * Get the list of all user accounts.
      *
-     * @return collection of all user accounts
+     * @return {@link List} of all user accounts
      */
-    public Collection<UserAccount> getAllUserAccounts() {
-        return accounts.values();
+    public List<UserAccount> getAllUserAccounts() {
+        return new ArrayList<>(accounts.values());
     }
 }

@@ -67,7 +67,7 @@ public class UserAccount {
             throw new IllegalArgumentException("Attempting to withdraw negative amount: " + amount);
         }
 
-        balance.subtract(amount);
+        balance = balance.subtract(amount);
     }
 
     /**
@@ -81,7 +81,7 @@ public class UserAccount {
             throw new IllegalArgumentException("Attempting to acquire negative amount: " + amount);
         }
 
-        balance.add(amount);
+        balance = balance.add(amount);
     }
 
     @Override
