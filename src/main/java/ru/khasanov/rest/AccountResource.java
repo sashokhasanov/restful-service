@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Root resource for managing user accounts.
@@ -29,15 +31,17 @@ public class AccountResource {
 
     private AccountManager accountManager = ApplicationService.getInstance().getAccountManager();
 
-    /**
-     *
-     * @return
-     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<UserAccount> getUsers() {
 
-        return accountManager.getAllAccounts();
+        try {
+            return accountManager.getAllAccounts();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new InternalServerErrorException("Request failed");
+        } catch (TimeoutException e) {
+            throw new ServiceUnavailableException("Request timed out");
+        }
     }
 
     @GET
@@ -45,35 +49,59 @@ public class AccountResource {
     @Produces(MediaType.APPLICATION_JSON)
     public UserAccount getUser(@PathParam(USER_ID) UUID userId) throws NotFoundException {
 
-        UserAccount account = accountManager.getAccount(userId);
-        if (account == null) {
-            throw new NotFoundException("Account not found: " + userId);
+        try {
+            UserAccount account = accountManager.getAccount(userId);
+            if (account != null) {
+                return account;
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new InternalServerErrorException("Request failed");
+        } catch (TimeoutException e) {
+            throw new ServiceUnavailableException("Request timed out");
         }
 
-        return account;
+        throw new NotFoundException("Account not found: " + userId);
     }
 
     @POST
     public Response createUserAccount() {
-        UserAccount account = accountManager.createNewAccount();
-        return Response.created(URI.create(ACCOUNTS + "/" + account.getUserId())).build();
+
+        try {
+            UserAccount account = accountManager.createNewAccount();
+            return Response.created(URI.create(ACCOUNTS + "/" + account.getUserId())).build();
+
+        } catch (InterruptedException | ExecutionException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (TimeoutException e) {
+            return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
+        }
     }
 
     @POST
     public Response createUserAccount(@QueryParam("id") UUID userId, @QueryParam("balance") BigDecimal balance) {
-        UserAccount account = accountManager.createNewAccount(userId, balance);
-        return Response.created(URI.create(ACCOUNTS + "/" + account.getUserId())).build();
+        try {
+            UserAccount account = accountManager.createNewAccount(userId, balance);
+            return Response.created(URI.create(ACCOUNTS + "/" + account.getUserId())).build();
+        } catch (InterruptedException | ExecutionException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (TimeoutException e) {
+            return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
+        }
     }
 
     @DELETE
     @Path(USER)
     public Response deleteUserAccount(@PathParam(USER_ID) UUID userId) {
 
-        if (accountManager.deleteAccount(userId)) {
-            return Response.ok().build();
+        try {
+            if (accountManager.deleteAccount(userId)) {
+                return Response.ok().build();
+            }
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } catch (InterruptedException | ExecutionException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (TimeoutException e) {
+            return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
         }
-
-        return Response.status(Response.Status.NOT_FOUND).build();
     }
-
 }

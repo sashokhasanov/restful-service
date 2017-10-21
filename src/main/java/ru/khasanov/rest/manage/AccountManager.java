@@ -58,24 +58,18 @@ public class AccountManager {
     /**
      * Create new user account.
      *
-     * @return {@link UserAccount} if it was successfully created. {@code null} otherwise
+     * @return created {@link UserAccount}
+     * @throws ExecutionException   if the computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws TimeoutException     if the wait timed out
      */
-    public UserAccount createNewAccount() {
-        try {
-            executorService.submit(() ->
-            {
-                UserAccount account = new UserAccount();
-                accountStorage.addAccount(account);
-                return account;
-            }).get(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public UserAccount createNewAccount() throws InterruptedException, ExecutionException, TimeoutException {
+
+        return executorService.submit(() -> {
+            UserAccount account = new UserAccount();
+            accountStorage.addAccount(account);
+            return account;
+        }).get(timeout, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -83,24 +77,18 @@ public class AccountManager {
      *
      * @param userId  user id. Must not be {@code null}
      * @param balance user balance. Must not be {@code null}
-     * @return {@link UserAccount} if it was successfully created. {@code null} otherwise
+     * @return created {@link UserAccount}
+     * @throws ExecutionException   if the computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws TimeoutException     if the wait timed out
      */
-    public UserAccount createNewAccount(UUID userId, BigDecimal balance) {
-        try {
-            executorService.submit(() ->
-            {
-                UserAccount account = new UserAccount(userId, balance);
-                accountStorage.addAccount(account);
-                return account;
-            }).get(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public UserAccount createNewAccount(UUID userId, BigDecimal balance) throws InterruptedException, ExecutionException, TimeoutException {
+
+        return executorService.submit(() -> {
+            UserAccount account = new UserAccount(userId, balance);
+            accountStorage.addAccount(account);
+            return account;
+        }).get(timeout, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -108,23 +96,14 @@ public class AccountManager {
      *
      * @param userId user id. Must not be {@code null}
      * @return {@code true} if account was successfully deleted. {@code false} otherwise
+     * @throws ExecutionException   if the computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws TimeoutException     if the wait timed out
      */
-    public boolean deleteAccount(UUID userId) {
-        try {
-            executorService.submit(() ->
-                    {
-                        return accountStorage.deleteAccount(userId);
-                    }
+    public boolean deleteAccount(UUID userId) throws InterruptedException, ExecutionException, TimeoutException {
 
-                    ).get(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return executorService.submit(() ->
+                accountStorage.deleteAccount(userId)).get(timeout, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -132,37 +111,28 @@ public class AccountManager {
      *
      * @param userId user id. Must not be {@code null}
      * @return {@link UserAccount} if exists. {@code null} otherwise
+     * @throws ExecutionException   if the computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws TimeoutException     if the wait timed out
      */
-    public UserAccount getAccount(UUID userId) {
-        try {
-            return executorService.submit(() ->
-                    accountStorage.getUserAccount(userId)).get(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public UserAccount getAccount(UUID userId) throws InterruptedException, ExecutionException, TimeoutException {
+
+        return executorService.submit(() ->
+                accountStorage.getUserAccount(userId)).get(timeout, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Get collection of all user accounts.
      *
      * @return collection of all user accounts
+     * @throws ExecutionException   if the computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws TimeoutException     if the wait timed out
      */
-    public Collection<UserAccount> getAllAccounts() {
-        try {
-            return executorService.submit(() ->
-                    accountStorage.getAllUserAccounts()).get(timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Collection<UserAccount> getAllAccounts() throws InterruptedException, ExecutionException, TimeoutException {
+
+        return executorService.submit(() ->
+                accountStorage.getAllUserAccounts()).get(timeout, TimeUnit.MILLISECONDS);
+
     }
 }
