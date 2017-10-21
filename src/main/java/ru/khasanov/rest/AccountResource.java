@@ -31,9 +31,14 @@ public class AccountResource {
 
     private AccountManager accountManager = ApplicationService.getInstance().getAccountManager();
 
+    /**
+     * Get all user accounts.
+     *
+     * @return Collection of all user accounts
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<UserAccount> getUsers() {
+    public Collection<UserAccount> getAllAccounts() {
 
         try {
             return accountManager.getAllAccounts();
@@ -44,10 +49,16 @@ public class AccountResource {
         }
     }
 
+    /**
+     * Get user account by id.
+     *
+     * @param userId user id. Must not be {@code null}
+     * @return {@link UserAccount} for specified id
+     */
     @GET
     @Path(USER)
     @Produces(MediaType.APPLICATION_JSON)
-    public UserAccount getUser(@PathParam(USER_ID) UUID userId) throws NotFoundException {
+    public UserAccount getAccount(@PathParam(USER_ID) UUID userId) {
 
         try {
             UserAccount account = accountManager.getAccount(userId);
@@ -63,8 +74,13 @@ public class AccountResource {
         throw new NotFoundException("Account not found: " + userId);
     }
 
+    /**
+     * Create new user account.
+     *
+     * @return {@link Response} specifying result of operation
+     */
     @POST
-    public Response createUserAccount() {
+    public Response createAccount() {
 
         try {
             UserAccount account = accountManager.createNewAccount();
@@ -77,8 +93,15 @@ public class AccountResource {
         }
     }
 
+    /**
+     * Create new user account.
+     *
+     * @param userId user id. Must not be {@code null}
+     * @param balance initial balance. Must not be {@code null}
+     * @return {@link Response} specifying result of operation
+     */
     @POST
-    public Response createUserAccount(@QueryParam("id") UUID userId, @QueryParam("balance") BigDecimal balance) {
+    public Response createAccount(@QueryParam("id") UUID userId, @QueryParam("balance") BigDecimal balance) {
         try {
             UserAccount account = accountManager.createNewAccount(userId, balance);
             return Response.created(URI.create(ACCOUNTS + "/" + account.getUserId())).build();
@@ -89,9 +112,15 @@ public class AccountResource {
         }
     }
 
+    /**
+     * Delete user account
+     *
+     * @param userId user id. Must not be {@code null}
+     * @return {@link Response} specifying result of operation
+     */
     @DELETE
     @Path(USER)
-    public Response deleteUserAccount(@PathParam(USER_ID) UUID userId) {
+    public Response deleteAccount(@PathParam(USER_ID) UUID userId) {
 
         try {
             if (accountManager.deleteAccount(userId)) {
