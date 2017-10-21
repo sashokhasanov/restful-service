@@ -18,11 +18,13 @@ import java.util.concurrent.TimeoutException;
  */
 public class AccountManager {
 
-    private static final int TIMEOUT_MILLISECONDS = 1000;
+    private static final int DEFAULT_TIMEOUT = 1000;
 
     private AccountStorage accountStorage;
 
     private ExecutorService executorService;
+
+    private int timeout = DEFAULT_TIMEOUT;
 
     /**
      * Creates new instance of {@link AccountManager}.
@@ -36,12 +38,30 @@ public class AccountManager {
     }
 
     /**
+     * Get timeout in milliseconds.
+     *
+     * @return timeout in milliseconds
+     */
+    public int getTimeout() {
+        return timeout;
+    }
+
+    /**
+     * Set up timeout.
+     *
+     * @param timeout timeout in milliseconds
+     */
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+    /**
      * Create new user account.
      */
     public void createNewAccount() {
         try {
             executorService.submit(() ->
-                    accountStorage.addAccount(new UserAccount())).get(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+                    accountStorage.addAccount(new UserAccount())).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -60,7 +80,7 @@ public class AccountManager {
     public void createNewAccount(UUID userId, BigDecimal balance) {
         try {
             executorService.submit(() ->
-                    accountStorage.addAccount(new UserAccount(userId, balance))).get(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+                    accountStorage.addAccount(new UserAccount(userId, balance))).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -78,7 +98,7 @@ public class AccountManager {
     public void deleteAccount(UUID userId) {
         try {
             executorService.submit(() ->
-                    accountStorage.deleteAccount(userId)).get(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+                    accountStorage.deleteAccount(userId)).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -97,7 +117,7 @@ public class AccountManager {
     public UserAccount find(UUID userId) {
         try {
             return executorService.submit(() ->
-                    accountStorage.getUserAccount(userId)).get(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+                    accountStorage.getUserAccount(userId)).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -116,7 +136,7 @@ public class AccountManager {
     public Collection<UserAccount> getAllAccounts() {
         try {
             return executorService.submit(() ->
-                    accountStorage.getAllUserAccounts()).get(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+                    accountStorage.getAllUserAccounts()).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

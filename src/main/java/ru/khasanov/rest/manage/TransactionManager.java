@@ -8,6 +8,7 @@ import ru.khasanov.rest.storage.TransactionStorage;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.*;
 
@@ -18,13 +19,15 @@ import java.util.concurrent.*;
  */
 public class TransactionManager {
 
-    private static final int TIMEOUT_MILLISECONDS = 3000;
+    private static final int DEFAULT_TIMEOUT = 1000;
 
     private TransactionStorage transactionStorage;
 
     private AccountStorage accountStorage;
 
     private ExecutorService executorService;
+
+    private int timeout = DEFAULT_TIMEOUT;
 
     /**
      * Creates new instance of {@link TransactionManager}
@@ -40,6 +43,24 @@ public class TransactionManager {
     }
 
     /**
+     * Get timeout in milliseconds.
+     *
+     * @return timeout in milliseconds.
+     */
+    public int getTimeout() {
+        return timeout;
+    }
+
+    /**
+     * Set up timeout.
+     *
+     * @param timeout timeout in milliseconds
+     */
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+    /**
      * Transfer amount from transmitter to recipient.
      *
      * @param fromId transmitter id. Must not be {@code null}
@@ -49,7 +70,7 @@ public class TransactionManager {
     public void transfer(UUID fromId, UUID toId, BigDecimal amount)
     {
         try {
-            executorService.submit(new TransferTask(fromId, toId, amount)).get(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+            executorService.submit(new TransferTask(fromId, toId, amount)).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -67,7 +88,7 @@ public class TransactionManager {
     public List<TransferTransaction> geAllTransactions()
     {
         try {
-            return executorService.submit(() -> transactionStorage.getAlTransactions()).get(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+            return executorService.submit(() -> transactionStorage.getAlTransactions()).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -87,7 +108,7 @@ public class TransactionManager {
     public List<TransferTransaction> getFromTransactions(UUID fromId)
     {
         try {
-            return executorService.submit(() -> transactionStorage.getFromTransactions(fromId)).get(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+            return executorService.submit(() -> transactionStorage.getFromTransactions(fromId)).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -107,7 +128,7 @@ public class TransactionManager {
     public List<TransferTransaction> getToTransactions(UUID toId)
     {
         try {
-            return executorService.submit(() -> transactionStorage.getFromTransactions(toId)).get(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+            return executorService.submit(() -> transactionStorage.getFromTransactions(toId)).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -141,7 +162,19 @@ public class TransactionManager {
 
             if (fromAccount == null || toAccount == null)
             {
-                throw new IllegalArgumentException("No such user");
+                StringJoiner joiner = new StringJoiner(",", "Users with following ids do not exist: ", "");
+
+                if (fromAccount == null)
+                {
+                    joiner.add(fromId.toString());
+                }
+
+                if (toAccount == null)
+                {
+                    joiner.add(toId.toString());
+                }
+
+                throw new IllegalArgumentException(joiner.toString());
             }
 
             if (amount.compareTo(BigDecimal.ZERO) <= 0)
@@ -159,5 +192,6 @@ public class TransactionManager {
             fromAccount.withdraw(amount);
             toAccount.acquire(amount);
         }
+
     }
 }
