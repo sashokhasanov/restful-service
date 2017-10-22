@@ -93,27 +93,6 @@ public class AccountResource {
     /**
      * Create new user account.
      *
-     * @return {@link Response} specifying result of operation
-     */
-    @POST
-    public Response createAccount() {
-
-        try {
-            UserAccount account = accountManager.createNewAccount();
-            return Response.created(URI.create(ACCOUNTS + "/" + account.getUserId())).build();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return Response.status(Response.Status.NOT_MODIFIED).build();
-        } catch (TimeoutException e) {
-            return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
-        } catch (ExecutionException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    /**
-     * Create new user account.
-     *
      * @param userId  user id. Must not be {@code null}
      * @param balance initial balance. Must not be {@code null}
      * @return {@link Response} specifying result of operation
