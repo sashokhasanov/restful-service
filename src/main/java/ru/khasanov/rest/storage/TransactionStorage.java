@@ -30,8 +30,6 @@ public class TransactionStorage {
 
         if (!from.equals(to)) {
             transactions.add(transaction);
-        } else {
-            // TODO log
         }
     }
 

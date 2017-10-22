@@ -1,5 +1,7 @@
 package ru.khasanov.rest.manage;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.khasanov.rest.model.TransferTransaction;
 import ru.khasanov.rest.model.UserAccount;
 import ru.khasanov.rest.storage.AccountStorage;
@@ -24,6 +26,8 @@ import java.util.concurrent.TimeoutException;
 public class TransactionManager {
 
     private static final int DEFAULT_TIMEOUT = 1000;
+
+    private static Logger logger = LogManager.getLogger(TransactionManager.class);
 
     private TransactionStorage transactionStorage;
 
@@ -123,20 +127,25 @@ public class TransactionManager {
 
                 if (fromAccount == null) {
                     joiner.add(fromId.toString());
+                    logger.warn("Account with following id does not exist: {}", fromId);
                 }
 
                 if (toAccount == null) {
                     joiner.add(toId.toString());
+                    logger.warn("Account with following id does not exist: {}", toId);
                 }
 
                 throw new IllegalArgumentException(joiner.toString());
             }
 
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+                logger.warn("Attempting to transfer negative amount: {}", amount);
                 throw new IllegalArgumentException("Attempting to transfer negative amount: " + amount);
             }
 
             if (fromAccount.getBalance().compareTo(amount) < 0) {
+                logger.warn(
+                        "Balance of {} is {}, while attempting to transfer {}", fromId, fromAccount.getBalance(), amount);
                 throw new IllegalArgumentException("Balance is too low");
             }
 

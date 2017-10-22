@@ -1,5 +1,7 @@
 package ru.khasanov.rest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.khasanov.rest.manage.TransactionManager;
 import ru.khasanov.rest.model.TransferTransaction;
 
@@ -24,7 +26,10 @@ import java.util.concurrent.TimeoutException;
 
 @Path("/transactions")
 public class TransactionsResource {
+
     private TransactionManager transactionManager = ApplicationService.getInstance().getTransactionManager();
+
+    private static Logger logger = LogManager.getLogger(TransactionsResource.class);
 
     /**
      * <p>Get list of transactions that match specific request query parameters.</p>
@@ -51,6 +56,7 @@ public class TransactionsResource {
         } catch (TimeoutException e) {
             throw new ServiceUnavailableException("Request processing timed out");
         } catch (ExecutionException e) {
+            logger.warn("Internal server error" + e.getMessage());
             throw new InternalServerErrorException("Internal error while request processing");
         }
     }
@@ -67,6 +73,7 @@ public class TransactionsResource {
         } catch (TimeoutException e) {
             return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
         } catch (ExecutionException e) {
+            logger.warn("Internal server error" + e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
