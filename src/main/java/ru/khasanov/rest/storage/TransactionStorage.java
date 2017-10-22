@@ -49,34 +49,29 @@ public class TransactionStorage {
      * @param queryParameters map of query parameters. Must not be {@code null}
      * @return {@link List} of transactions that match passed query parameters.
      */
-    public List<TransferTransaction> getTransactions(MultivaluedMap<String, String> queryParameters)
-    {
+    public List<TransferTransaction> getTransactions(MultivaluedMap<String, String> queryParameters) {
         Stream<TransferTransaction> transferTransactionStream = transactions.stream();
 
         String fromIdString = queryParameters.getFirst("from_id");
-        if (fromIdString != null && !fromIdString.isEmpty())
-        {
+        if (fromIdString != null && !fromIdString.isEmpty()) {
             final UUID fromId = UUID.fromString(fromIdString);
             transferTransactionStream = transferTransactionStream.filter(p -> fromId.equals(p.getFrom()));
         }
 
         String toIdString = queryParameters.getFirst("to_id");
-        if (toIdString != null && !toIdString.isEmpty())
-        {
+        if (toIdString != null && !toIdString.isEmpty()) {
             final UUID toId = UUID.fromString(toIdString);
             transferTransactionStream = transferTransactionStream.filter(p -> toId.equals(p.getTo()));
         }
 
         String fromDateString = queryParameters.getFirst("from_date");
-        if (fromDateString != null && !fromDateString.isEmpty())
-        {
+        if (fromDateString != null && !fromDateString.isEmpty()) {
             final OffsetDateTime fromDate = OffsetDateTime.parse(fromDateString);
             transferTransactionStream = transferTransactionStream.filter(p -> fromDate.compareTo(p.getDateTime()) <= 0);
         }
 
         String toDateString = queryParameters.getFirst("to_date");
-        if (toDateString != null && !toDateString.isEmpty())
-        {
+        if (toDateString != null && !toDateString.isEmpty()) {
             final OffsetDateTime toDate = OffsetDateTime.parse(toDateString);
             transferTransactionStream = transferTransactionStream.filter(p -> p.getDateTime().compareTo(toDate) <= 0);
         }
