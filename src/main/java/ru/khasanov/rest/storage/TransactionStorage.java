@@ -2,6 +2,7 @@ package ru.khasanov.rest.storage;
 
 import ru.khasanov.rest.model.TransferTransaction;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,50 +36,50 @@ public class TransactionStorage {
     }
 
     /**
-     * Get list of all transactions.
+     * <p>Get list of transactions that match specific query parameters.</p>
+     * <p>Following parameters are accepted:</p>
+     * <ul>
+     * <li>from_id - specifies id of the transmitter. This parameter should match {@link UUID} string representation.</li>
+     * <li>to_id - specifies id of the recipient. This parameter should match {@link UUID} string representation.</li>
+     * <li>from_date - specifies beginning of time period. This parameter should match {@link OffsetDateTime} string representation.</li>
+     * <li>to_date - specifies ending of time period. This parameter should match {@link OffsetDateTime} string representation.</li>
+     * </ul>
+     * <p>Parameters that are not supported are ignored while method execution.</p>
      *
-     * @return {@link List} of all transactions.
+     * @param queryParameters map of query parameters. Must not be {@code null}
+     * @return {@link List} of transactions that match passed query parameters.
      */
-    public List<TransferTransaction> getAlTransactions() {
-        return transactions;
-    }
+    public List<TransferTransaction> getTransactions(MultivaluedMap<String, String> queryParameters)
+    {
+        Stream<TransferTransaction> transferTransactionStream = transactions.stream();
 
-    /**
-     * Get list of transactions for specific transmitter.
-     *
-     * @param from transmitter id. Must not be {@code null}
-     * @return {@link List} of transactions for passed transmitter id
-     */
-    public List<TransferTransaction> getFromTransactions(UUID from) {
-        Stream<TransferTransaction> transferTransactionStream =
-                transactions.stream().filter(p -> from.equals(p.getFrom()));
+        String fromIdString = queryParameters.getFirst("from_id");
+        if (fromIdString != null && !fromIdString.isEmpty())
+        {
+            final UUID fromId = UUID.fromString(fromIdString);
+            transferTransactionStream = transferTransactionStream.filter(p -> fromId.equals(p.getFrom()));
+        }
 
-        return transferTransactionStream.collect(Collectors.toList());
-    }
+        String toIdString = queryParameters.getFirst("to_id");
+        if (toIdString != null && !toIdString.isEmpty())
+        {
+            final UUID toId = UUID.fromString(toIdString);
+            transferTransactionStream = transferTransactionStream.filter(p -> toId.equals(p.getTo()));
+        }
 
-    /**
-     * Get list of transactions for specific recipient.
-     *
-     * @param to recipient id. Must not be {@code null}
-     * @return {@link List} of transactions for passed recipient id
-     */
-    public List<TransferTransaction> getToTransactions(UUID to) {
-        Stream<TransferTransaction> transferTransactionStream =
-                transactions.stream().filter(p -> to.equals(p.getTo()));
+        String fromDateString = queryParameters.getFirst("from_date");
+        if (fromDateString != null && !fromDateString.isEmpty())
+        {
+            final OffsetDateTime fromDate = OffsetDateTime.parse(fromDateString);
+            transferTransactionStream = transferTransactionStream.filter(p -> fromDate.compareTo(p.getDateTime()) <= 0);
+        }
 
-        return transferTransactionStream.collect(Collectors.toList());
-    }
-
-    /**
-     * Get list of transactions for specific period of time.
-     *
-     * @param fromDate start point. Must not be {@code null}
-     * @param toDate   end point. Must not be {@code null}
-     * @return {@link List} of transactions for specified period of time
-     */
-    public List<TransferTransaction> getDateTimeTransactions(OffsetDateTime fromDate, OffsetDateTime toDate) {
-        Stream<TransferTransaction> transferTransactionStream =
-                transactions.stream().filter(p -> fromDate.compareTo(p.getDateTime()) <= 0 && p.getDateTime().compareTo(toDate) <= 0);
+        String toDateString = queryParameters.getFirst("to_date");
+        if (toDateString != null && !toDateString.isEmpty())
+        {
+            final OffsetDateTime toDate = OffsetDateTime.parse(toDateString);
+            transferTransactionStream = transferTransactionStream.filter(p -> p.getDateTime().compareTo(toDate) <= 0);
+        }
 
         return transferTransactionStream.collect(Collectors.toList());
     }

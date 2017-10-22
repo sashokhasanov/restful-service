@@ -5,6 +5,7 @@ import ru.khasanov.rest.model.UserAccount;
 import ru.khasanov.rest.storage.AccountStorage;
 import ru.khasanov.rest.storage.TransactionStorage;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -78,66 +79,25 @@ public class TransactionManager {
     }
 
     /**
-     * Get all transactions.
+     * <p>Get list of transactions that match specific query parameters.</p>
+     * <p>Following parameters are accepted:</p>
+     * <ul>
+     * <li>from_id - specifies id of the transmitter. This parameter should match {@link UUID} string representation.</li>
+     * <li>to_id - specifies id of the recipient. This parameter should match {@link UUID} string representation.</li>
+     * <li>from_date - specifies beginning of time period. This parameter should match {@link OffsetDateTime} string representation.</li>
+     * <li>to_date - specifies ending of time period. This parameter should match {@link OffsetDateTime} string representation.</li>
+     * </ul>
+     * <p>Parameters that are not supported are ignored while method execution.</p>
      *
-     * @return list of all transactions.
+     * @param queryParameters map of query parameters. Must not be {@code null}
+     * @return {@link List} of transactions that match passed query parameters.
      * @throws InterruptedException if the current thread was interrupted while waiting
      * @throws ExecutionException   if the computation threw an exception
      * @throws TimeoutException     if the wait timed out
      */
-    public List<TransferTransaction> geAllTransactions() throws InterruptedException, ExecutionException, TimeoutException {
-
+    public List<TransferTransaction> getTransactions(MultivaluedMap<String, String> queryParameters) throws InterruptedException, ExecutionException, TimeoutException {
         return executorService.submit(() ->
-                transactionStorage.getAlTransactions()).get(timeout, TimeUnit.MILLISECONDS);
-
-    }
-
-    /**
-     * Get list of transactions for specific transmitter.
-     *
-     * @param fromId transmitter id. Must not be {@code null}
-     * @return list of transactions for specified transmitter
-     * @throws InterruptedException if the current thread was interrupted while waiting
-     * @throws ExecutionException   if the computation threw an exception
-     * @throws TimeoutException     if the wait timed out
-     */
-    public List<TransferTransaction> getFromTransactions(UUID fromId) throws InterruptedException, ExecutionException, TimeoutException {
-
-        return executorService.submit(() ->
-                transactionStorage.getFromTransactions(fromId)).get(timeout, TimeUnit.MILLISECONDS);
-
-    }
-
-    /**
-     * Get all transactions for specific recipient.
-     *
-     * @param toId recipient id. Must not be {@code null}
-     * @return list of transactions for specified recipient
-     * @throws InterruptedException if the current thread was interrupted while waiting
-     * @throws ExecutionException   if the computation threw an exception
-     * @throws TimeoutException     if the wait timed out
-     */
-    public List<TransferTransaction> getToTransactions(UUID toId) throws InterruptedException, ExecutionException, TimeoutException {
-
-        return executorService.submit(() ->
-                transactionStorage.getToTransactions(toId)).get(timeout, TimeUnit.MILLISECONDS);
-
-    }
-
-    /**
-     * Get list of transactions for specific period of time.
-     *
-     * @param fromDate start point. Must not be {@code null}
-     * @param toDate   end point. Must not be {@code null}
-     * @return @link List} of transactions for specified period of time
-     * @throws InterruptedException if the current thread was interrupted while waiting
-     * @throws ExecutionException   if the computation threw an exception
-     * @throws TimeoutException     if the wait timed out
-     */
-    public List<TransferTransaction> getDateTimeTransactions(OffsetDateTime fromDate, OffsetDateTime toDate) throws InterruptedException, ExecutionException, TimeoutException {
-        return executorService.submit(() ->
-                transactionStorage.getDateTimeTransactions(fromDate, toDate)).get(timeout, TimeUnit.MILLISECONDS);
-
+                transactionStorage.getTransactions(queryParameters)).get(timeout, TimeUnit.MILLISECONDS);
     }
 
     private class TransferTask implements Runnable {
