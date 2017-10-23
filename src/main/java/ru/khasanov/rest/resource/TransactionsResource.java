@@ -1,7 +1,8 @@
-package ru.khasanov.rest;
+package ru.khasanov.rest.resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.khasanov.rest.ApplicationService;
 import ru.khasanov.rest.manage.TransactionManager;
 import ru.khasanov.rest.model.TransferTransaction;
 
