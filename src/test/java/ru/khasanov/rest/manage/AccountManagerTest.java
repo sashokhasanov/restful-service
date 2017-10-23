@@ -29,8 +29,7 @@ public class AccountManagerTest {
     private AccountManager accountManager;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         AccountStorage storage = new AccountStorage();
         ExecutorService executorService = Executors.newSingleThreadExecutor();
 
