@@ -3,7 +3,6 @@ package ru.khasanov.rest.storage;
 import ru.khasanov.rest.model.TransferTransaction;
 
 import javax.ws.rs.core.MultivaluedMap;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,8 +38,8 @@ public class TransactionStorage {
      * <ul>
      * <li>from_id - specifies id of the transmitter. This parameter should match {@link UUID} string representation.</li>
      * <li>to_id - specifies id of the recipient. This parameter should match {@link UUID} string representation.</li>
-     * <li>from_date - specifies beginning of time period. This parameter should match {@link OffsetDateTime} string representation.</li>
-     * <li>to_date - specifies ending of time period. This parameter should match {@link OffsetDateTime} string representation.</li>
+     * <li>from_date - specifies beginning of time period. </li>
+     * <li>to_date - specifies ending of time period. </li>
      * </ul>
      * <p>Parameters that are not supported are ignored while method execution.</p>
      *
@@ -62,16 +61,17 @@ public class TransactionStorage {
             transferTransactionStream = transferTransactionStream.filter(p -> toId.equals(p.getTo()));
         }
 
-        String fromDateString = queryParameters.getFirst("from_date");
-        if (fromDateString != null && !fromDateString.isEmpty()) {
-            final OffsetDateTime fromDate = OffsetDateTime.parse(fromDateString);
-            transferTransactionStream = transferTransactionStream.filter(p -> fromDate.compareTo(p.getDateTime()) <= 0);
+        String fromTimestampString = queryParameters.getFirst("from_date");
+        if (fromTimestampString != null && !fromTimestampString.isEmpty()) {
+            final long fromTimestamp = Long.valueOf(fromTimestampString);
+            transferTransactionStream = transferTransactionStream.filter(p -> fromTimestamp <= p.getTimestamp());
         }
 
-        String toDateString = queryParameters.getFirst("to_date");
-        if (toDateString != null && !toDateString.isEmpty()) {
-            final OffsetDateTime toDate = OffsetDateTime.parse(toDateString);
-            transferTransactionStream = transferTransactionStream.filter(p -> p.getDateTime().compareTo(toDate) <= 0);
+        String toTimestampString = queryParameters.getFirst("to_date");
+        if (toTimestampString != null && !toTimestampString.isEmpty()) {
+
+            final long toTimestamp = Long.valueOf(toTimestampString);
+            transferTransactionStream = transferTransactionStream.filter(p -> p.getTimestamp() <= toTimestamp);
         }
 
         return transferTransactionStream.collect(Collectors.toList());

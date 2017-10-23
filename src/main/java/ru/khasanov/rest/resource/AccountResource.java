@@ -108,6 +108,15 @@ public class AccountResource {
     @POST
     public Response createAccount(@QueryParam("id") UUID userId, @QueryParam("balance") BigDecimal balance) {
         try {
+
+            if (userId == null) {
+                userId = UUID.randomUUID();
+            }
+
+            if (balance == null) {
+                balance = BigDecimal.ZERO;
+            }
+
             UserAccount account = accountManager.createNewAccount(userId, balance);
             return Response.created(URI.create(ACCOUNTS + "/" + account.getUserId())).build();
         } catch (InterruptedException e) {

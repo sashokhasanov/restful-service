@@ -3,7 +3,6 @@ package ru.khasanov.rest.model;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -24,21 +23,28 @@ public class TransferTransaction {
     private BigDecimal amount;
 
     @XmlElement
-    private OffsetDateTime dateTime;
+    private long timestamp;
+
+    /**
+     * Creates new instance of {@link TransferTransaction}
+     * This only required for JAXB and should not be used to to create instances of {@link TransferTransaction}.
+     */
+    public TransferTransaction() {
+    }
 
     /**
      * Creates new instance of {@link TransferTransaction}.
      *
-     * @param from     transmitter id
-     * @param to       recipient id
-     * @param amount   transfer amount
-     * @param dateTime date and time of transfer operation
+     * @param from      transmitter id
+     * @param to        recipient id
+     * @param amount    transfer amount
+     * @param timestamp timestamp of transfer operation
      */
-    public TransferTransaction(UUID from, UUID to, BigDecimal amount, OffsetDateTime dateTime) {
+    public TransferTransaction(UUID from, UUID to, BigDecimal amount, long timestamp) {
         this.from = from;
         this.to = to;
         this.amount = amount;
-        this.dateTime = dateTime;
+        this.timestamp = timestamp;
     }
 
     /**
@@ -69,12 +75,12 @@ public class TransferTransaction {
     }
 
     /**
-     * Get transfer date and time.
+     * Get transfer timestamp.
      *
-     * @return transfer date and time
+     * @return transfer timestamp
      */
-    public OffsetDateTime getDateTime() {
-        return dateTime;
+    public long getTimestamp() {
+        return timestamp;
     }
 
     @Override
@@ -84,10 +90,10 @@ public class TransferTransaction {
 
         TransferTransaction that = (TransferTransaction) o;
 
+        if (timestamp != that.timestamp) return false;
         if (!from.equals(that.from)) return false;
         if (!to.equals(that.to)) return false;
-        if (!amount.equals(that.amount)) return false;
-        return dateTime.equals(that.dateTime);
+        return amount.equals(that.amount);
     }
 
     @Override
@@ -95,8 +101,7 @@ public class TransferTransaction {
         int result = from.hashCode();
         result = 31 * result + to.hashCode();
         result = 31 * result + amount.hashCode();
-        result = 31 * result + dateTime.hashCode();
+        result = 31 * result + (int) (timestamp ^ (timestamp >>> 32));
         return result;
     }
-
 }

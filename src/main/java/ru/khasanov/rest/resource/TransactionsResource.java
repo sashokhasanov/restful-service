@@ -19,18 +19,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-@Path("/transactions")
+@Path(TransactionsResource.TRANSACTIONS)
 public class TransactionsResource {
 
-    private TransactionManager transactionManager = ApplicationService.getInstance().getTransactionManager();
+    public static final String TRANSACTIONS = "/transactions";
+
+    public static final String TRANSFER = "/transfer";
 
     private static Logger logger = LogManager.getLogger(TransactionsResource.class);
+
+    private TransactionManager transactionManager = ApplicationService.getInstance().getTransactionManager();
 
     /**
      * <p>Get list of transactions that match specific request query parameters.</p>
@@ -38,8 +41,8 @@ public class TransactionsResource {
      * <ul>
      * <li>from_id - specifies id of the transmitter. This parameter should match {@link UUID} string representation.</li>
      * <li>to_id - specifies id of the recipient. This parameter should match {@link UUID} string representation.</li>
-     * <li>from_date - specifies beginning of time period. This parameter should match {@link OffsetDateTime} string representation.</li>
-     * <li>to_date - specifies ending of time period. This parameter should match {@link OffsetDateTime} string representation.</li>
+     * <li>from_date - specifies beginning of time period. </li>
+     * <li>to_date - specifies ending of time period. </li>
      * </ul>
      * <p>Parameters that are not supported are ignored while method execution.</p>
      *
@@ -63,8 +66,13 @@ public class TransactionsResource {
     }
 
     @POST
-    @Path("/transfer")
+    @Path(TRANSFER)
     public Response transfer(@QueryParam("from") UUID fromId, @QueryParam("to") UUID toId, @QueryParam("amount") BigDecimal amount) {
+
+        if (fromId == null || toId == null || amount == null) {
+            return Response.status(Response.Status.NOT_MODIFIED).build();
+        }
+
         try {
             transactionManager.transfer(fromId, toId, amount);
             return Response.ok().build();
@@ -74,6 +82,12 @@ public class TransactionsResource {
         } catch (TimeoutException e) {
             return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
         } catch (ExecutionException e) {
+
+            if (e.getCause() instanceof IllegalArgumentException) {
+                logger.warn("Request not processed due to reason: " + e.getCause().getMessage());
+                return Response.status(Response.Status.NOT_MODIFIED).build();
+            }
+
             logger.warn("Internal server error" + e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }

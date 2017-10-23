@@ -9,7 +9,6 @@ import ru.khasanov.rest.storage.TransactionStorage;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -88,8 +87,8 @@ public class TransactionManager {
      * <ul>
      * <li>from_id - specifies id of the transmitter. This parameter should match {@link UUID} string representation.</li>
      * <li>to_id - specifies id of the recipient. This parameter should match {@link UUID} string representation.</li>
-     * <li>from_date - specifies beginning of time period. This parameter should match {@link OffsetDateTime} string representation.</li>
-     * <li>to_date - specifies ending of time period. This parameter should match {@link OffsetDateTime} string representation.</li>
+     * <li>from_date - specifies beginning of time period. </li>
+     * <li>to_date - specifies ending of time period. </li>
      * </ul>
      * <p>Parameters that are not supported are ignored while method execution.</p>
      *
@@ -105,6 +104,7 @@ public class TransactionManager {
     }
 
     private class TransferTask implements Runnable {
+
         private UUID fromId;
 
         private UUID toId;
@@ -149,7 +149,7 @@ public class TransactionManager {
                 throw new IllegalArgumentException("Balance is too low");
             }
 
-            TransferTransaction transaction = new TransferTransaction(fromId, toId, amount, OffsetDateTime.now());
+            TransferTransaction transaction = new TransferTransaction(fromId, toId, amount, System.currentTimeMillis());
             transactionStorage.addTransaction(transaction);
             fromAccount.withdraw(amount);
             toAccount.acquire(amount);
