@@ -30,7 +30,7 @@ public class Main {
     public static HttpServer startServer() {
         // create a resource config that scans for JAX-RS resources and providers
         // in ru.khasanov.rest package
-        final ResourceConfig rc = new ResourceConfig().packages("ru.khasanov.rest.resource");
+        final ResourceConfig rc = new ResourceConfig().packages("ru.khasanov.rest");
 
         // create and start a new instance of grizzly http server
         // exposing the Jersey application at BASE_URI
@@ -60,7 +60,10 @@ public class Main {
         }
     }
 
-    private static void initApplicationService() {
+    /**
+     * Init helper service.
+     */
+    public static void initApplicationService() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
 
         AccountStorage accountStorage = new AccountStorage();
