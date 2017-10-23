@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Class that is used to manage accounts storead in {@link AccountStorage}.
+ * Class that is used to manage accounts stored in {@link AccountStorage}.
  *
  * @author Aleksandr Khasanov
  */
