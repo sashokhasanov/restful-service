@@ -6,6 +6,9 @@
 .idea/**/tasks.xml
 .idea/dictionaries
 
+# Sensitive or high-churn files:
+.idea/**/uiDesigner.xml
+
 # Maven
 .idea/**/libraries
 *.iml
