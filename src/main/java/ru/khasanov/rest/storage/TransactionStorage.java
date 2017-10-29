@@ -1,6 +1,7 @@
 package ru.khasanov.rest.storage;
 
 import ru.khasanov.rest.model.TransferTransaction;
+import ru.khasanov.rest.resource.TransactionsRequestParameters;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
@@ -49,25 +50,25 @@ public class TransactionStorage {
     public List<TransferTransaction> getTransactions(MultivaluedMap<String, String> queryParameters) {
         Stream<TransferTransaction> transferTransactionStream = transactions.stream();
 
-        String fromIdString = queryParameters.getFirst("from_id");
+        String fromIdString = queryParameters.getFirst(TransactionsRequestParameters.FROM_ID);
         if (fromIdString != null && !fromIdString.isEmpty()) {
             final UUID fromId = UUID.fromString(fromIdString);
             transferTransactionStream = transferTransactionStream.filter(p -> fromId.equals(p.getFrom()));
         }
 
-        String toIdString = queryParameters.getFirst("to_id");
+        String toIdString = queryParameters.getFirst(TransactionsRequestParameters.TO_ID);
         if (toIdString != null && !toIdString.isEmpty()) {
             final UUID toId = UUID.fromString(toIdString);
             transferTransactionStream = transferTransactionStream.filter(p -> toId.equals(p.getTo()));
         }
 
-        String fromTimestampString = queryParameters.getFirst("from_date");
+        String fromTimestampString = queryParameters.getFirst(TransactionsRequestParameters.FROM_DATE);
         if (fromTimestampString != null && !fromTimestampString.isEmpty()) {
             final long fromTimestamp = Long.valueOf(fromTimestampString);
             transferTransactionStream = transferTransactionStream.filter(p -> fromTimestamp <= p.getTimestamp());
         }
 
-        String toTimestampString = queryParameters.getFirst("to_date");
+        String toTimestampString = queryParameters.getFirst(TransactionsRequestParameters.TO_DATE);
         if (toTimestampString != null && !toTimestampString.isEmpty()) {
 
             final long toTimestamp = Long.valueOf(toTimestampString);

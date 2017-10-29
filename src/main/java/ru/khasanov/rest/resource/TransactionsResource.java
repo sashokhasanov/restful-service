@@ -46,7 +46,7 @@ public class TransactionsResource {
      * </ul>
      * <p>Parameters that are not supported are ignored while method execution.</p>
      *
-     * @param info request uri information
+     * @param info request uri information. Must not be {@code null}
      * @return {@link List} of transactions that match request query parameters
      */
     @GET
@@ -65,11 +65,35 @@ public class TransactionsResource {
         }
     }
 
+    /**
+     * Transfer specified amount between accounts.
+     *
+     * @param fromId transmitter id. In case of {@code null} value no transfer is performed
+     * @param toId   recipient id. In case of {@code null} value no transfer is performed
+     * @param amount amount to transfer. In case of {@code null} value no transfer is performed
+     * @return {@link Response} specifying result of operation
+     */
     @POST
     @Path(TRANSFER)
-    public Response transfer(@QueryParam("from") UUID fromId, @QueryParam("to") UUID toId, @QueryParam("amount") BigDecimal amount) {
+    public Response transfer(
+            @QueryParam(TransferQueryParameters.FROM) UUID fromId,
+            @QueryParam(TransferQueryParameters.TO) UUID toId,
+            @QueryParam(TransferQueryParameters.AMOUNT) BigDecimal amount) {
 
         if (fromId == null || toId == null || amount == null) {
+
+            if (fromId == null) {
+                logger.warn("Parameter 'from' has null value");
+            }
+
+            if (toId == null) {
+                logger.warn("Parameter 'to' has null value");
+            }
+
+            if (amount == null) {
+                logger.warn("Parameter 'amount' has null value");
+            }
+
             return Response.status(Response.Status.NOT_MODIFIED).build();
         }
 

@@ -101,22 +101,23 @@ public class AccountResource {
     /**
      * Create new user account.
      *
-     * @param userId  user id. Must not be {@code null}
-     * @param balance initial balance. Must not be {@code null}
+     * @param userId  user id. In case of {@code null} value random {@code UUID} will be used.
+     * @param balance initial balance. In case of {@code null} value {@code BigDecimal.ZERO} will be used.
      * @return {@link Response} specifying result of operation
      */
     @POST
-    public Response createAccount(@QueryParam("id") UUID userId, @QueryParam("balance") BigDecimal balance) {
+    public Response createAccount(@QueryParam(AccountsRequestParameters.ID) UUID userId,
+                                  @QueryParam(AccountsRequestParameters.BALANCE) BigDecimal balance) {
+
+        if (userId == null) {
+            userId = UUID.randomUUID();
+        }
+
+        if (balance == null) {
+            balance = BigDecimal.ZERO;
+        }
+
         try {
-
-            if (userId == null) {
-                userId = UUID.randomUUID();
-            }
-
-            if (balance == null) {
-                balance = BigDecimal.ZERO;
-            }
-
             UserAccount account = accountManager.createNewAccount(userId, balance);
             return Response.created(URI.create(ACCOUNTS + "/" + account.getUserId())).build();
         } catch (InterruptedException e) {
@@ -131,7 +132,7 @@ public class AccountResource {
     }
 
     /**
-     * Delete user account
+     * Delete user account.
      *
      * @param userId user id. Must not be {@code null}
      * @return {@link Response} specifying result of operation

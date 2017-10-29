@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.khasanov.rest.model.TransferTransaction;
 import ru.khasanov.rest.model.UserAccount;
+import ru.khasanov.rest.resource.TransactionsRequestParameters;
 import ru.khasanov.rest.storage.AccountStorage;
 import ru.khasanov.rest.storage.TransactionStorage;
 
@@ -166,7 +167,7 @@ public class TransactionManagerTest {
         transactionManager.transfer(id2, id3, BigDecimal.valueOf(10));
 
         MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
-        queryParameters.add("from_id", id1.toString());
+        queryParameters.add(TransactionsRequestParameters.FROM_ID, id1.toString());
         List<TransferTransaction> transactions = transactionManager.getTransactions(queryParameters);
 
         assertEquals(2, transactions.size());
@@ -195,7 +196,7 @@ public class TransactionManagerTest {
         transactionManager.transfer(id2, id3, BigDecimal.valueOf(10));
 
         MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
-        queryParameters.add("to_id", id3.toString());
+        queryParameters.add(TransactionsRequestParameters.TO_ID, id3.toString());
         List<TransferTransaction> transactions = transactionManager.getTransactions(queryParameters);
 
         assertEquals(2, transactions.size());
@@ -224,10 +225,47 @@ public class TransactionManagerTest {
         transactionManager.transfer(id2, id3, BigDecimal.valueOf(10));
 
         MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
-        queryParameters.add("from_id", id1.toString());
-        queryParameters.add("to_id", id3.toString());
+        queryParameters.add(TransactionsRequestParameters.FROM_ID, id1.toString());
+        queryParameters.add(TransactionsRequestParameters.TO_ID, id3.toString());
         List<TransferTransaction> transactions = transactionManager.getTransactions(queryParameters);
 
         assertEquals(1, transactions.size());
+    }
+
+    @Test
+    public void testTransactionsDateTime() throws InterruptedException, ExecutionException, TimeoutException {
+        UUID id1 = UUID.randomUUID();
+        BigDecimal balance1 = BigDecimal.valueOf(100);
+        UserAccount account1 = new UserAccount(id1, balance1);
+        accountStorage.addAccount(account1);
+
+        UUID id2 = UUID.randomUUID();
+        BigDecimal balance2 = BigDecimal.valueOf(100);
+        UserAccount account2 = new UserAccount(id2, balance2);
+        accountStorage.addAccount(account2);
+
+        long timestamp1 = System.currentTimeMillis();
+
+        Thread.sleep(100);
+
+        transactionManager.transfer(id1, id2, BigDecimal.valueOf(10));
+        transactionManager.transfer(id1, id2, BigDecimal.valueOf(10));
+
+        Thread.sleep(100);
+
+        long timestamp2 = System.currentTimeMillis();
+
+
+        Thread.sleep(100);
+        transactionManager.transfer(id1, id2, BigDecimal.valueOf(10));
+
+
+        MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
+        queryParameters.add(TransactionsRequestParameters.FROM_DATE, String.valueOf(timestamp1));
+        queryParameters.add(TransactionsRequestParameters.TO_DATE, String.valueOf(timestamp2));
+
+        List<TransferTransaction> transactions = transactionManager.getTransactions(queryParameters);
+
+        assertEquals(2, transactions.size());
     }
 }

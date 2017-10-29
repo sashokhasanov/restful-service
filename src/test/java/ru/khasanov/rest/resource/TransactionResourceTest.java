@@ -1,6 +1,5 @@
-package ru.kasanov.rest.resource;
+package ru.khasanov.rest.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.hamcrest.core.Is;
 import org.junit.After;
@@ -9,8 +8,6 @@ import org.junit.Test;
 import ru.khasanov.rest.Main;
 import ru.khasanov.rest.model.TransferTransaction;
 import ru.khasanov.rest.model.UserAccount;
-import ru.khasanov.rest.resource.AccountResource;
-import ru.khasanov.rest.resource.TransactionsResource;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -59,9 +56,9 @@ public class TransactionResourceTest {
 
         Response transferResponse = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", from)
-                .queryParam("to", to)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, from)
+                .queryParam(TransferQueryParameters.TO, to)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -82,15 +79,14 @@ public class TransactionResourceTest {
 
         Response transferResponse = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", from)
-                .queryParam("to", to)
-                .queryParam("amount", new BigDecimal(10).negate())
+                .queryParam(TransferQueryParameters.FROM, from)
+                .queryParam(TransferQueryParameters.TO, to)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10).negate())
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
         assertEquals(Response.Status.NOT_MODIFIED.getStatusCode(), transferResponse.getStatus());
     }
-
 
     @Test
     public void testTransferFromNotExistingAccount() {
@@ -99,9 +95,9 @@ public class TransactionResourceTest {
 
         Response transferResponse = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", from)
-                .queryParam("to", to)
-                .queryParam("amount", new BigDecimal(10).negate())
+                .queryParam(TransferQueryParameters.FROM, from)
+                .queryParam(TransferQueryParameters.TO, to)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10).negate())
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -110,14 +106,15 @@ public class TransactionResourceTest {
 
     @Test
     public void testTransferToNotExistingAccount() {
+
         UUID from = createUserAccount();
         UUID to = UUID.randomUUID();
 
         Response transferResponse = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", from)
-                .queryParam("to", to)
-                .queryParam("amount", new BigDecimal(10).negate())
+                .queryParam(TransferQueryParameters.FROM, from)
+                .queryParam(TransferQueryParameters.TO, to)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10).negate())
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -126,8 +123,6 @@ public class TransactionResourceTest {
 
     @Test
     public void testGetAllTransactions() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
 
         UUID id1 = createUserAccount();
         UUID id2 = createUserAccount();
@@ -135,9 +130,9 @@ public class TransactionResourceTest {
 
         Response transferResponse1 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id1)
-                .queryParam("to", id2)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id2)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -145,9 +140,9 @@ public class TransactionResourceTest {
 
         Response transferResponse2 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id1)
-                .queryParam("to", id3)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id3)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -155,9 +150,9 @@ public class TransactionResourceTest {
 
         Response transferResponse3 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id2)
-                .queryParam("to", id3)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id2)
+                .queryParam(TransferQueryParameters.TO, id3)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -174,8 +169,6 @@ public class TransactionResourceTest {
 
     @Test
     public void testGetFromTransactions() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
 
         UUID id1 = createUserAccount();
         UUID id2 = createUserAccount();
@@ -183,9 +176,9 @@ public class TransactionResourceTest {
 
         Response transferResponse1 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id1)
-                .queryParam("to", id2)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id2)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -193,9 +186,9 @@ public class TransactionResourceTest {
 
         Response transferResponse2 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id1)
-                .queryParam("to", id3)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id3)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -203,18 +196,17 @@ public class TransactionResourceTest {
 
         Response transferResponse3 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id2)
-                .queryParam("to", id3)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id2)
+                .queryParam(TransferQueryParameters.TO, id3)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
         assumeThat(transferResponse3.getStatus(), Is.is(Response.Status.OK.getStatusCode()));
 
-
         List<TransferTransaction> transactions = target.
                 path(TransactionsResource.TRANSACTIONS)
-                .queryParam("from_id", id1)
+                .queryParam(TransactionsRequestParameters.FROM_ID, id1)
                 .request(MediaType.APPLICATION_JSON).get(new GenericType<List<TransferTransaction>>() {
                 });
 
@@ -223,8 +215,6 @@ public class TransactionResourceTest {
 
     @Test
     public void testGetToTransactions() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
 
         UUID id1 = createUserAccount();
         UUID id2 = createUserAccount();
@@ -232,9 +222,9 @@ public class TransactionResourceTest {
 
         Response transferResponse1 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id1)
-                .queryParam("to", id2)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id2)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -242,9 +232,9 @@ public class TransactionResourceTest {
 
         Response transferResponse2 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id1)
-                .queryParam("to", id3)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id3)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -252,9 +242,9 @@ public class TransactionResourceTest {
 
         Response transferResponse3 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id2)
-                .queryParam("to", id3)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id2)
+                .queryParam(TransferQueryParameters.TO, id3)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -263,7 +253,7 @@ public class TransactionResourceTest {
 
         List<TransferTransaction> transactions = target.
                 path(TransactionsResource.TRANSACTIONS)
-                .queryParam("to_id", id2)
+                .queryParam(TransactionsRequestParameters.TO_ID, id2)
                 .request(MediaType.APPLICATION_JSON).get(new GenericType<List<TransferTransaction>>() {
                 });
 
@@ -272,8 +262,6 @@ public class TransactionResourceTest {
 
     @Test
     public void testGetFromToTransactions() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
 
         UUID id1 = createUserAccount();
         UUID id2 = createUserAccount();
@@ -281,9 +269,9 @@ public class TransactionResourceTest {
 
         Response transferResponse1 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id1)
-                .queryParam("to", id2)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id2)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -291,9 +279,9 @@ public class TransactionResourceTest {
 
         Response transferResponse2 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id1)
-                .queryParam("to", id3)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id3)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -301,9 +289,9 @@ public class TransactionResourceTest {
 
         Response transferResponse3 = target
                 .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
-                .queryParam("from", id2)
-                .queryParam("to", id3)
-                .queryParam("amount", new BigDecimal(10))
+                .queryParam(TransferQueryParameters.FROM, id2)
+                .queryParam(TransferQueryParameters.TO, id3)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
 
@@ -312,12 +300,68 @@ public class TransactionResourceTest {
 
         List<TransferTransaction> transactions = target.
                 path(TransactionsResource.TRANSACTIONS)
-                .queryParam("from_id", id1)
-                .queryParam("to_id", id3)
+                .queryParam(TransactionsRequestParameters.FROM_ID, id1)
+                .queryParam(TransactionsRequestParameters.TO_ID, id3)
                 .request(MediaType.APPLICATION_JSON).get(new GenericType<List<TransferTransaction>>() {
                 });
 
         assertEquals(1, transactions.size());
+    }
+
+    @Test
+    public void testDateTimeTransactions() throws InterruptedException {
+
+        UUID id1 = createUserAccount();
+        UUID id2 = createUserAccount();
+
+        long timestamp1 = System.currentTimeMillis();
+        Thread.sleep(100);
+
+        Response transferResponse1 = target
+                .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id2)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(""));
+
+        assumeThat(transferResponse1.getStatus(), Is.is(Response.Status.OK.getStatusCode()));
+
+        Response transferResponse2 = target
+                .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id2)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(""));
+
+        assumeThat(transferResponse2.getStatus(), Is.is(Response.Status.OK.getStatusCode()));
+
+        Thread.sleep(100);
+
+        long timestamp2 = System.currentTimeMillis();
+
+        Thread.sleep(100);
+
+        Response transferResponse3 = target
+                .path(TransactionsResource.TRANSACTIONS + TransactionsResource.TRANSFER)
+                .queryParam(TransferQueryParameters.FROM, id1)
+                .queryParam(TransferQueryParameters.TO, id2)
+                .queryParam(TransferQueryParameters.AMOUNT, new BigDecimal(10))
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(""));
+
+        assumeThat(transferResponse3.getStatus(), Is.is(Response.Status.OK.getStatusCode()));
+
+
+        List<TransferTransaction> transactions = target.
+                path(TransactionsResource.TRANSACTIONS)
+                .queryParam(TransactionsRequestParameters.FROM_DATE, timestamp1)
+                .queryParam(TransactionsRequestParameters.TO_DATE, timestamp2)
+                .request(MediaType.APPLICATION_JSON).get(new GenericType<List<TransferTransaction>>() {
+                });
+
+        assertEquals(2, transactions.size());
     }
 
     private UUID createUserAccount() {
@@ -325,8 +369,8 @@ public class TransactionResourceTest {
         BigDecimal balance = BigDecimal.valueOf(100);
 
         Response responseMsg = target.path(AccountResource.ACCOUNTS + "/")
-                .queryParam("id", id.toString())
-                .queryParam("balance", balance)
+                .queryParam(AccountsRequestParameters.ID, id.toString())
+                .queryParam(AccountsRequestParameters.BALANCE, balance)
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(""));
         assumeThat(responseMsg.getStatus(), Is.is(Response.Status.CREATED.getStatusCode()));

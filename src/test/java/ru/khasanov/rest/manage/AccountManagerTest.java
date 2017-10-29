@@ -36,7 +36,6 @@ public class AccountManagerTest {
         accountManager = new AccountManager(storage, executorService);
     }
 
-
     @Test
     public void testCreateAccount() throws InterruptedException, ExecutionException, TimeoutException {
 
@@ -44,7 +43,7 @@ public class AccountManagerTest {
 
         UUID id = UUID.randomUUID();
         BigDecimal balance = BigDecimal.TEN;
-        UserAccount account = accountManager.createNewAccount(id, balance);
+        accountManager.createNewAccount(id, balance);
 
         List<UserAccount> accounts = accountManager.getAllAccounts();
         assertEquals(1, accounts.size());

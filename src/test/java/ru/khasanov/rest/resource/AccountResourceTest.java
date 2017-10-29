@@ -1,4 +1,4 @@
-package ru.kasanov.rest.resource;
+package ru.khasanov.rest.resource;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.hamcrest.core.Is;
@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.khasanov.rest.Main;
 import ru.khasanov.rest.model.UserAccount;
-import ru.khasanov.rest.resource.AccountResource;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -143,7 +142,6 @@ public class AccountResourceTest {
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 
-
     @Test
     public void testDeleteExistingAccount() {
 
@@ -170,9 +168,8 @@ public class AccountResourceTest {
         });
 
         assertEquals(1, accounts.size());
-        assertFalse(accounts.get(0).getUserId().equals(id));
+        assertFalse(accounts.get(0).getUserId().toString().equals(id));
     }
-
 
     @Test
     public void testDeleteNotExistingAccount() {

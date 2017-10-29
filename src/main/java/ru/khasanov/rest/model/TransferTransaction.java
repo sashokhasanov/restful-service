@@ -27,7 +27,7 @@ public class TransferTransaction {
 
     /**
      * Creates new instance of {@link TransferTransaction}
-     * This only required for JAXB and should not be used to to create instances of {@link TransferTransaction}.
+     * This required for JAXB and should not be used to to create instances of {@link TransferTransaction}.
      */
     public TransferTransaction() {
     }
