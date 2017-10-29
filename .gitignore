@@ -13,6 +13,9 @@
 .idea/**/libraries
 *.iml
 
+# Maven shade plugin
+dependency-reduced-pom.xml
+
 # File-based project format:
 *.iws
 
