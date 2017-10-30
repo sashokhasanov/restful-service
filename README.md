@@ -1,7 +1,10 @@
-# restful-service
+# RESTful service
 
-Build executable jar with maven command:
-`mvn clean package`
+Simple REST API modelling money transfer between accounts.
 
-Run service with following command:
-`java -Dlog4j.configurationFile=src/main/resources/log4j.xml -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -jar target/restful-service-1.0-SNAPSHOT-jar-with-dependencies.jar`
+**Build and run guide**
+----
+
+* *Build executable jar:* `mvn clean package`
+
+* *Run service with following command:* `java -Dlog4j.configurationFile=src/main/resources/log4j.xml -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -jar target/restful-service-1.0-SNAPSHOT.jar`
